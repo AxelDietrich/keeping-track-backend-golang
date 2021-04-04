@@ -1,1 +1,1 @@
-# keeping-track-backend-golang
+Backend RESTful API for KeepingTrack application.
