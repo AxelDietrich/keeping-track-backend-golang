@@ -38,6 +38,17 @@ func UpdateSubcategory(db *gorm.DB, id int, name string) error {
 	return nil
 }
 
+func GetSubcategory(db *gorm.DB, subID int) (*models.Subcategory, error) {
+
+	var err error
+	var sub *models.Subcategory
+	err = db.Find(&sub).Where("id = ?", subID).Error
+	if err != nil {
+		return &models.Subcategory{}, err
+	}
+	return sub, err
+}
+
 func GetAllSubcategories(db *gorm.DB, categoryID int) ([]*models.Subcategory, error) {
 	var err error
 	var subcategories []*models.Subcategory

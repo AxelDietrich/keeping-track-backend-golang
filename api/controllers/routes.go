@@ -7,5 +7,6 @@ func (server *Server) initializeRoutes() {
 	server.Router.HandleFunc("/{categoryID}/subcategory", server.CreateSubcategory).Methods("POST")
 	server.Router.HandleFunc("/{categoryID}/subcategories", server.GetAllSubcategories).Methods("GET")
 	server.Router.HandleFunc("/subcategory/{subcategoryID}", server.ModifySubcategory).Methods("PATCH").Queries("name", "{name}")
+	server.Router.HandleFunc("/{subcategoryID}/record", server.CreateRecord).Methods("POST")
 
 }
