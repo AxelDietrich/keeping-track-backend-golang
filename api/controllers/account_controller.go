@@ -2,34 +2,38 @@ package controllers
 
 import (
 	"encoding/json"
-	"fmt"
+	"errors"
 	"io/ioutil"
 	m "keeping-track-backend-golang/api/models"
 	"keeping-track-backend-golang/api/repositories"
+	"keeping-track-backend-golang/api/responses"
 	"net/http"
 	"regexp"
 	"strings"
-	"errors"
 )
 
-func (server *Server) CreateAccount (w http.ResponseWriter, r *http.Request) {
+func (server *Server) CreateAccount(w http.ResponseWriter, r *http.Request) {
 	var err error
 	reqBody, _ := ioutil.ReadAll(r.Body)
 	var account m.Account
 	err = json.Unmarshal(reqBody, &account)
 	if err != nil {
+		responses.ERROR(w, 400, err)
 		return
 	}
 	err = validateAccount("", &account)
 	if err != nil {
+		responses.ERROR(w, 400, err)
 		return
 	}
-	repositories.CreateAccount(server.DB, &account)
 
-	fmt.Println("Endpoint Hit: Create Account")
-	json.NewEncoder(w).Encode(account)
+	accountPersisted, err := repositories.CreateAccount(server.DB, &account)
+	if err != nil {
+		responses.ERROR(w, 400, err)
+	} else {
+		responses.JSON(w, 200, accountPersisted)
+	}
 }
-
 
 func validateAccount(action string, a *m.Account) error {
 	re := regexp.MustCompile("^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$")
@@ -52,6 +56,9 @@ func validateAccount(action string, a *m.Account) error {
 		}
 		if a.Password == "" {
 			return errors.New("Required Password")
+		}
+		if len(a.Password) < 6 {
+			return errors.New("Password must have at least 6 characters")
 		}
 		if a.Email == "" {
 			return errors.New("Required Email")
