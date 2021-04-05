@@ -11,24 +11,26 @@ import (
 	"strconv"
 )
 
-func (server *Server) CreateRecord(w http.ResponseWriter, r *http.Request) {
+func (server *Server) MoveFundsToSavings(w http.ResponseWriter, r *http.Request) {
 
 	var err error
 	vars := mux.Vars(r)
 	reqBody, _ := ioutil.ReadAll(r.Body)
-	rec := &requests.AddRecordRequest{}
-	err = json.Unmarshal(reqBody, rec)
+	amount := &requests.MoveToSavingsRequest{}
+	err = json.Unmarshal(reqBody, amount)
+	if err != nil {
+		responses.ERROR(w, http.StatusBadRequest, err)
+		return
+	}
+	accID, err := strconv.Atoi(vars["accountID"])
 	if err != nil {
 		responses.ERROR(w, http.StatusBadRequest, err)
 	}
-	subID, err := strconv.Atoi(vars["subcategoryID"])
-	if err != nil {
-		responses.ERROR(w, http.StatusBadRequest, err)
-	}
-	err = repositories.CreateRecord(server.DB, rec, subID)
+	err = repositories.MoveFundsToSavings(server.DB, amount.Amount, accID)
 	if err != nil {
 		responses.ERROR(w, http.StatusInternalServerError, err)
 		return
 	}
-	responses.JSONString(w, http.StatusOK, "Record succesfully created")
+	responses.JSONString(w, http.StatusOK, "Funds successfully moved to savings")
+
 }

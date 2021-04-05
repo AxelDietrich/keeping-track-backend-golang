@@ -10,7 +10,7 @@ func CreateSubcategory(db *gorm.DB, s *models.Subcategory) error {
 
 	var err error
 	var sub *models.Subcategory
-	err = db.Where("name = ? AND category_id", s.Name, s.CategoryID).First(&sub).Error
+	err = db.Where("name = ? AND category_id = ?", s.Name, s.CategoryID).First(&sub).Error
 	if err == nil {
 		return errors.New("There is already a subcategory with that name")
 	}
@@ -57,4 +57,14 @@ func GetAllSubcategories(db *gorm.DB, categoryID int) ([]*models.Subcategory, er
 		panic(err)
 	}
 	return subcategories, nil
+}
+
+func DeleteSubcategory(db *gorm.DB, subcategoryID int) error {
+	var err error
+	sub := &models.Subcategory{}
+	err = db.Where("id = ?", subcategoryID).Delete(&sub).Error
+	if err != nil {
+		return err
+	}
+	return nil
 }

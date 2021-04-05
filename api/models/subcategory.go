@@ -10,6 +10,7 @@ type Subcategory struct {
 	Amount     float64   `json:"amount"`
 	CategoryID int       `json:"-"`
 	Category   Category  `json:"-"`
+	Records    []Record  `gorm:"OnDelete:CASCADE" json:"-"`
 	CreatedAt  time.Time `gorm:"default:CURRENT_TIMESTAMP" json:"created_at"`
 	UpdatedAt  time.Time `gorm:"default:CURRENT_TIMESTAMP" json:"updated_at"`
 }

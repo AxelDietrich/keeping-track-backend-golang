@@ -19,21 +19,21 @@ func (server *Server) Login(w http.ResponseWriter, r *http.Request) {
 	var login m.Account
 	err = json.Unmarshal(reqBody, &login)
 	if err != nil {
-		responses.ERROR(w, 500, err)
+		responses.ERROR(w, http.StatusInternalServerError, err)
 		return
 	}
 	PrepareLogin(&login)
 	loginDB, err := repositories.GetAccount(server.DB, &login)
 	if err != nil {
-		responses.ERROR(w, 400, err)
+		responses.ERROR(w, http.StatusBadRequest, err)
 		return
 	}
 	err = m.VerifyPassword(loginDB.Password, login.Password)
 	if err != nil && err == bcrypt.ErrMismatchedHashAndPassword {
-		responses.ERROR(w, 400, errors.New("Invalid password"))
+		responses.ERROR(w, http.StatusBadRequest, errors.New("Invalid password"))
 		return
 	}
-	responses.JSONString(w, 200, "Login successful")
+	responses.JSONString(w, http.StatusOK, "Login successful")
 }
 
 func PrepareLogin(a *m.Account) {

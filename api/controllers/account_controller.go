@@ -18,20 +18,20 @@ func (server *Server) CreateAccount(w http.ResponseWriter, r *http.Request) {
 	var account m.Account
 	err = json.Unmarshal(reqBody, &account)
 	if err != nil {
-		responses.ERROR(w, 400, err)
+		responses.ERROR(w, http.StatusBadRequest, err)
 		return
 	}
 	err = validateAccount("", &account)
 	if err != nil {
-		responses.ERROR(w, 400, err)
+		responses.ERROR(w, http.StatusBadRequest, err)
 		return
 	}
 
 	accountPersisted, err := repositories.CreateAccount(server.DB, &account)
 	if err != nil {
-		responses.ERROR(w, 400, err)
+		responses.ERROR(w, http.StatusBadRequest, err)
 	} else {
-		responses.JSON(w, 200, accountPersisted)
+		responses.JSON(w, http.StatusOK, accountPersisted)
 	}
 }
 
