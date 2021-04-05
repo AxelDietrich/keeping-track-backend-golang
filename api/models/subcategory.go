@@ -5,7 +5,7 @@ import (
 )
 
 type Subcategory struct {
-	ID         int64     `gorm:"primary_key;auto_increment" json:"id"`
+	ID         int       `gorm:"primary_key;auto_increment" json:"id"`
 	Name       string    `json:"name"`
 	Amount     float64   `json:"amount"`
 	CategoryID int       `json:"-"`
