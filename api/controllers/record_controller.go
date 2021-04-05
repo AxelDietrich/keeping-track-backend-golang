@@ -32,3 +32,19 @@ func (server *Server) CreateRecord(w http.ResponseWriter, r *http.Request) {
 	}
 	responses.JSONString(w, http.StatusOK, "Record succesfully created")
 }
+
+func (server *Server) DeleteRecord(w http.ResponseWriter, r *http.Request) {
+
+	var err error
+	vars := mux.Vars(r)
+	recID, err := strconv.Atoi(vars["recordID"])
+	if err != nil {
+		responses.ERROR(w, http.StatusBadRequest, err)
+	}
+	err = repositories.DeleteRecord(server.DB, recID)
+	if err != nil {
+		responses.ERROR(w, http.StatusInternalServerError, err)
+		return
+	}
+	responses.JSONString(w, http.StatusOK, "Record successfully deleted")
+}

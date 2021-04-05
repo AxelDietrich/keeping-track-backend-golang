@@ -61,8 +61,7 @@ func GetAllSubcategories(db *gorm.DB, categoryID int) ([]*models.Subcategory, er
 
 func DeleteSubcategory(db *gorm.DB, subcategoryID int) error {
 	var err error
-	sub := &models.Subcategory{}
-	err = db.Where("id = ?", subcategoryID).Delete(&sub).Error
+	err = db.Where("id = ?", subcategoryID).Delete(&models.Subcategory{}).Error
 	if err != nil {
 		return err
 	}
