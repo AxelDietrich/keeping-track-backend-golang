@@ -5,6 +5,11 @@ type AddRecordRequest struct {
 	Amount float64
 }
 
-type MoveToSavingsRequest struct {
+type AmountRequest struct {
 	Amount float64
+}
+
+type Login struct {
+	Email    string
+	Password string
 }

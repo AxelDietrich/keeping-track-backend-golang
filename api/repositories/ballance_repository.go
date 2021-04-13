@@ -1,16 +1,17 @@
 package repositories
 
 import (
+	"database/sql"
 	"errors"
-	"gorm.io/gorm"
 	"keeping-track-backend-golang/api/models"
 )
 
-func MoveFundsToSavings(db *gorm.DB, amount float64, accID int) error {
+func MoveFundsToSavings(db *sql.DB, amount float64, accID int) error {
 
 	var err error
 	b := &models.Balance{}
-	err = db.Model(&b).Where("account_id = ?", accID).Take(&b).Error
+	err = db.QueryRow("select * from keepingtrack.balances where account_id = $1;", accID).
+		Scan(&b.ID, &b.AvailableAmount, &b.SavingsAmount, &b.Debt, &b.AccountID)
 	if err != nil {
 		return err
 	}
@@ -19,10 +20,22 @@ func MoveFundsToSavings(db *gorm.DB, amount float64, accID int) error {
 	}
 	b.AvailableAmount = b.AvailableAmount - amount
 	b.SavingsAmount = b.SavingsAmount + amount
-	err = db.Save(&b).Error
+	err = db.QueryRow("update keepingtrack.balances set available_amount = $1, savings_amount = $2 where id = $3;",
+		&b.AvailableAmount, &b.SavingsAmount, &b.ID).Err()
 	if err != nil {
 		return err
 	}
 	return nil
 
+}
+
+func AddIncome(db *sql.DB, amount float64, accID int) error {
+
+	var err error
+	err = db.QueryRow("update keepingtrack.balances set available_amount = available_amount + $1 where account_id = $2;",
+		amount, accID).Err()
+	if err != nil {
+		return err
+	}
+	return nil
 }

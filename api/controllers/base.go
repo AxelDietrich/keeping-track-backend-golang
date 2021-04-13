@@ -1,17 +1,17 @@
 package controllers
 
 import (
+	"database/sql"
 	"errors"
 	"fmt"
 	"github.com/gorilla/mux"
-	"gorm.io/gorm"
 	"keeping-track-backend-golang/database"
 	"log"
 	"net/http"
 )
 
 type Server struct {
-	DB	*gorm.DB
+	DB     *sql.DB
 	Router *mux.Router
 }
 

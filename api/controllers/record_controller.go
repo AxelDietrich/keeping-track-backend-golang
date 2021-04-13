@@ -33,6 +33,31 @@ func (server *Server) CreateRecord(w http.ResponseWriter, r *http.Request) {
 	responses.JSONString(w, http.StatusOK, "Record succesfully created")
 }
 
+func (server *Server) UpdateRecord(w http.ResponseWriter, r *http.Request) {
+
+	var err error
+	vars := mux.Vars(r)
+	reqBody, _ := ioutil.ReadAll(r.Body)
+	recordRequest := &requests.AddRecordRequest{}
+	err = json.Unmarshal(reqBody, recordRequest)
+	if err != nil {
+		responses.ERROR(w, http.StatusBadRequest, err)
+		return
+	}
+	recID, err := strconv.Atoi(vars["recordID"])
+	if err != nil {
+		responses.ERROR(w, http.StatusBadRequest, err)
+		return
+	}
+	err = repositories.UpdateRecord(server.DB, recID, recordRequest)
+	if err != nil {
+		responses.ERROR(w, http.StatusInternalServerError, err)
+		return
+	}
+	responses.JSONString(w, http.StatusOK, "The record has been successfully updated")
+
+}
+
 func (server *Server) DeleteRecord(w http.ResponseWriter, r *http.Request) {
 
 	var err error
@@ -40,6 +65,7 @@ func (server *Server) DeleteRecord(w http.ResponseWriter, r *http.Request) {
 	recID, err := strconv.Atoi(vars["recordID"])
 	if err != nil {
 		responses.ERROR(w, http.StatusBadRequest, err)
+		return
 	}
 	err = repositories.DeleteRecord(server.DB, recID)
 	if err != nil {

@@ -1,14 +1,9 @@
 package models
 
 type Category struct {
-	ID            int           `gorm:"primary_key;auto_increment" json:"id"`
-	Name          string        `json:"name"`
-	Income        bool          `json:"income"`
-	AccountID     int           `json:"-"`
-	Account       Account       `json:"-"`
-	Subcategories []Subcategory `gorm:"OnDelete:CASCADE" json:"-"`
-}
-
-func (Category) TableName() string {
-	return "keepingtrack.categories"
+	ID        int     `json:"id"`
+	Name      string  `json:"name"`
+	Income    bool    `json:"income"`
+	AccountID int     `json:"-"`
+	Account   Account `json:"-"`
 }
