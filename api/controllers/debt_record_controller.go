@@ -73,3 +73,18 @@ func (server *Server) UpdateDebtRecord(w http.ResponseWriter, r *http.Request) {
 	}
 	responses.JSONString(w, http.StatusOK, "Record successfully updated")
 }
+
+func (server *Server) GetAllDebtRecordsBySubcategoryID(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	subID, err := strconv.Atoi(vars["subcategoryID"])
+	if err != nil {
+		responses.ERROR(w, http.StatusBadRequest, err)
+		return
+	}
+	records, err := repositories.GetAllDebtRecordsBySubcategoryID(server.DB, subID)
+	if err != nil {
+		responses.ERROR(w, http.StatusBadRequest, err)
+		return
+	}
+	responses.JSON(w, http.StatusOK, records)
+}

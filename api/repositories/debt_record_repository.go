@@ -106,3 +106,19 @@ func PropagateDebtRecord(tx *sql.Tx, r *models.DebtRecord) error {
 	tx.Commit()
 	return nil
 }
+
+func GetAllDebtRecordsBySubcategoryID(db *sql.DB, subID int) (records []*models.DebtRecord, err error) {
+	rows, err := db.Query("select * from keepingtrack.debt_records where subcategory_id = $1", subID)
+	if err != nil {
+		return records, err
+	}
+
+	rec := &models.DebtRecord{}
+	for rows.Next() {
+		rows.Scan(&rec.Name, &rec.ID, &rec.Amount, &rec.Payed, &rec.CreatedAt, &rec.UpdatedAt, &rec.PayedAt, &rec.SubcategoryID)
+		records = append(records, rec)
+	}
+
+	rows.Close()
+	return records, nil
+}

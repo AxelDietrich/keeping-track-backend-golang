@@ -208,3 +208,19 @@ func PropagateRecordChanges(tx *sql.Tx, r *models.Record) error {
 	tx.Commit()
 	return nil
 }
+
+func GetAllRecordsBySubcategoryID(db *sql.DB, subID int) (records []*models.Record, err error) {
+	rows, err := db.Query("select * from keepingtrack.records where subcategory_id = $1", subID)
+	if err != nil {
+		return records, err
+	}
+
+	rec := &models.Record{}
+	for rows.Next() {
+		rows.Scan(&rec.ID, &rec.Name, &rec.Amount, &rec.CreatedAt, &rec.UpdatedAt, &rec.SubcategoryID)
+		records = append(records, rec)
+	}
+
+	rows.Close()
+	return records, nil
+}
