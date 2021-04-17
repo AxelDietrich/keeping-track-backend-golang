@@ -76,3 +76,20 @@ func (server *Server) DeleteRecord(w http.ResponseWriter, r *http.Request) {
 	}
 	responses.JSONString(w, http.StatusOK, "Record successfully deleted")
 }
+
+func (server *Server) GetAllRecordsBySubcategoryID(w http.ResponseWriter, r *http.Request) {
+
+	var err error
+	vars := mux.Vars(r)
+	subID, err := strconv.Atoi(vars["subcategoryID"])
+	if err != nil {
+		responses.ERROR(w, http.StatusBadRequest, err)
+		return
+	}
+	records, err := repositories.GetAllRecordsBySubcategoryID(server.DB, subID)
+	if err != nil {
+		responses.ERROR(w, http.StatusInternalServerError, err)
+		return
+	}
+	responses.JSON(w, http.StatusOK, records)
+}
