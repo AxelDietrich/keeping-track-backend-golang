@@ -6,6 +6,17 @@ import (
 	"keeping-track-backend-golang/api/models"
 )
 
+func CheckIfUserSubcategory(db *sql.DB, subID int, accID int) error {
+	var id int
+	err := db.QueryRow("select id from keepingtrack.subcategories s inner join keepingtrack.categories c on "+
+		"s.category_id = c.id where c.account_id = $1 and s.id = $2", accID, subID).
+		Scan(&id)
+	if err != nil || id == 0 {
+		return err
+	}
+	return nil
+}
+
 func CreateSubcategory(db *sql.DB, s *models.Subcategory) error {
 
 	var err error

@@ -17,9 +17,16 @@ import (
 func (server *Server) CreateSubcategory(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	var err error
-	/*if len(vars) == 0 {
-		responses.ERROR(w, http.StatusBadRequest, errors)
-	}*/
+	catID, err := strconv.Atoi(vars["categoryID"])
+	if err != nil {
+		responses.ERROR(w, http.StatusBadRequest, err)
+		return
+	}
+	accID, _ := strconv.Atoi(r.Header.Get("userID"))
+	err = repositories.CheckIfUserCategory(server.DB, catID, accID)
+	if err != nil {
+		responses.ERROR(w, http.StatusBadRequest, err)
+	}
 	reqBody, _ := ioutil.ReadAll(r.Body)
 	var subcategory models.Subcategory
 	err = json.Unmarshal(reqBody, &subcategory)
@@ -51,6 +58,15 @@ func (server *Server) ModifySubcategory(w http.ResponseWriter, r *http.Request) 
 	var err error
 	vars := mux.Vars(r)
 	id, err := strconv.Atoi(vars["subcategoryID"])
+	if err != nil {
+		responses.ERROR(w, http.StatusBadRequest, err)
+		return
+	}
+	accID, err := strconv.Atoi(r.Header.Get("userID"))
+	err = repositories.CheckIfUserSubcategory(server.DB, id, accID)
+	if err != nil {
+		responses.ERROR(w, http.StatusBadRequest, err)
+	}
 	err = repositories.UpdateSubcategory(server.DB, id, vars["name"])
 	if err != nil {
 		responses.ERROR(w, http.StatusBadRequest, err)
@@ -64,6 +80,11 @@ func (server *Server) DeleteSubcategory(w http.ResponseWriter, r *http.Request) 
 	var err error
 	vars := mux.Vars(r)
 	subID, err := strconv.Atoi(vars["subcategoryID"])
+	if err != nil {
+		responses.ERROR(w, http.StatusBadRequest, err)
+	}
+	accID, err := strconv.Atoi(r.Header.Get("userID"))
+	err = repositories.CheckIfUserSubcategory(server.DB, subID, accID)
 	if err != nil {
 		responses.ERROR(w, http.StatusBadRequest, err)
 	}
@@ -83,6 +104,8 @@ func (server *Server) GetAllSubcategories(w http.ResponseWriter, r *http.Request
 		responses.ERROR(w, http.StatusBadRequest, errors.New("Invalid categoryID"))
 		return
 	}
+	accID, _ := strconv.Atoi(r.Header.Get("userID"))
+	err = repositories.CheckIfUserCategory(server.DB, categoryID, accID)
 	subcategories, err := repositories.GetAllSubcategories(server.DB, categoryID)
 	responses.JSON(w, http.StatusOK, subcategories)
 

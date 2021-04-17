@@ -2,9 +2,21 @@ package repositories
 
 import (
 	"database/sql"
+	"errors"
 	"keeping-track-backend-golang/api/models"
 	"keeping-track-backend-golang/api/requests"
 )
+
+func CheckIfUserDebtRecord(db *sql.DB, recID int, accID int) error {
+	var id int
+	err := db.QueryRow("select id from keepingtrack.debt_records r inner join keepingtrack.subcategories on r.subcategory_id = s.id"+
+		"inner join keepingtrack.categories c on s.category_id = c.id"+
+		"where r.id = $1 and c.account_id = $2", recID, accID).Scan(&id)
+	if err != nil || id == 0 {
+		return errors.New("Record doesn't belong to logged user")
+	}
+	return nil
+}
 
 func UpdateDebRecord(db *sql.DB, recID int, r *requests.AddRecordRequest) error {
 	var err error

@@ -17,6 +17,10 @@ func (server *Server) MoveFundsToSavings(w http.ResponseWriter, r *http.Request)
 
 	var err error
 	vars := mux.Vars(r)
+	if vars["accountID"] != r.Header.Get("userID") {
+		responses.ERROR(w, http.StatusBadRequest, err)
+		return
+	}
 	reqBody, _ := ioutil.ReadAll(r.Body)
 	amount := &requests.AmountRequest{}
 	err = json.Unmarshal(reqBody, amount)
@@ -41,6 +45,10 @@ func (server *Server) AddIncome(w http.ResponseWriter, r *http.Request) {
 
 	var err error
 	vars := mux.Vars(r)
+	if vars["accountID"] != r.Header.Get("userID") {
+		responses.ERROR(w, http.StatusBadRequest, err)
+		return
+	}
 	amount := &requests.AmountRequest{}
 	reqBody, _ := ioutil.ReadAll(r.Body)
 	err = json.Unmarshal(reqBody, amount)
@@ -64,6 +72,10 @@ func (server *Server) AddIncome(w http.ResponseWriter, r *http.Request) {
 
 func (server *Server) GetBalance(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
+	if vars["accountID"] != r.Header.Get("userID") {
+		responses.ERROR(w, http.StatusBadRequest, err)
+		return
+	}
 	accID, err := strconv.Atoi(vars["accountID"])
 	if err != nil {
 		responses.ERROR(w, http.StatusBadRequest, err)
