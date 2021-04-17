@@ -11,8 +11,7 @@ import (
 	"strconv"
 )
 
-func (server *Server) CreateRecord(w http.ResponseWriter, r *http.Request) {
-
+func (server *Server) CreateDebtRecord(w http.ResponseWriter, r *http.Request) {
 	var err error
 	vars := mux.Vars(r)
 	reqBody, _ := ioutil.ReadAll(r.Body)
@@ -27,21 +26,37 @@ func (server *Server) CreateRecord(w http.ResponseWriter, r *http.Request) {
 		responses.ERROR(w, http.StatusBadRequest, err)
 		return
 	}
-	err = repositories.CreateRecord(server.DB, rec, subID)
+	err = repositories.CreateDebtRecord(server.DB, rec, subID)
+	if err != nil {
+		responses.ERROR(w, http.StatusBadRequest, err)
+		return
+	}
+	responses.JSONString(w, http.StatusOK, "Debt record created succesffully")
+
+}
+
+func (server *Server) DeleteDebtRecord(w http.ResponseWriter, r *http.Request) {
+	var err error
+	vars := mux.Vars(r)
+	recID, err := strconv.Atoi(vars["recordID"])
+	if err != nil {
+		responses.ERROR(w, http.StatusBadRequest, err)
+		return
+	}
+	err = repositories.DeleteDebtRecord(server.DB, recID)
 	if err != nil {
 		responses.ERROR(w, http.StatusInternalServerError, err)
 		return
 	}
-	responses.JSONString(w, http.StatusOK, "Record succesfully created")
+	responses.JSONString(w, http.StatusOK, "Debt record succesfully deleted.")
 }
 
-func (server *Server) UpdateRecord(w http.ResponseWriter, r *http.Request) {
-
+func (server *Server) UpdateDebtRecord(w http.ResponseWriter, r *http.Request) {
 	var err error
 	vars := mux.Vars(r)
 	reqBody, _ := ioutil.ReadAll(r.Body)
-	recordRequest := &requests.AddRecordRequest{}
-	err = json.Unmarshal(reqBody, recordRequest)
+	req := &requests.AddRecordRequest{}
+	err = json.Unmarshal(reqBody, req)
 	if err != nil {
 		responses.ERROR(w, http.StatusBadRequest, err)
 		return
@@ -51,28 +66,10 @@ func (server *Server) UpdateRecord(w http.ResponseWriter, r *http.Request) {
 		responses.ERROR(w, http.StatusBadRequest, err)
 		return
 	}
-	err = repositories.UpdateRecord(server.DB, recID, recordRequest)
+	err = repositories.UpdateDebRecord(server.DB, recID, req)
 	if err != nil {
 		responses.ERROR(w, http.StatusInternalServerError, err)
 		return
 	}
-	responses.JSONString(w, http.StatusOK, "The record has been successfully updated")
-
-}
-
-func (server *Server) DeleteRecord(w http.ResponseWriter, r *http.Request) {
-
-	var err error
-	vars := mux.Vars(r)
-	recID, err := strconv.Atoi(vars["recordID"])
-	if err != nil {
-		responses.ERROR(w, http.StatusBadRequest, err)
-		return
-	}
-	err = repositories.DeleteRecord(server.DB, recID)
-	if err != nil {
-		responses.ERROR(w, http.StatusInternalServerError, err)
-		return
-	}
-	responses.JSONString(w, http.StatusOK, "Record successfully deleted")
+	responses.JSONString(w, http.StatusOK, "Record successfully updated")
 }

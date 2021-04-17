@@ -12,5 +12,9 @@ func (server *Server) initializeRoutes() {
 	server.Router.HandleFunc("/subcategory/{subcategoryID}", server.DeleteSubcategory).Methods("DELETE")
 	server.Router.HandleFunc("/record/{recordID}", server.DeleteRecord).Methods("DELETE")
 	//server.Router.HandleFunc("/{accountID}/income", server.AddIncome).Methods("POST")
-	server.Router.HandleFunc("/record/{recordID}", server.UpdateRecord).Methods("POST")
+	server.Router.HandleFunc("/record/{recordID}", server.UpdateRecord).Methods("PUT")
+	server.Router.HandleFunc("/{subcategoryID}/record/debt", server.CreateDebtRecord).Methods("POST")
+	server.Router.HandleFunc("/{accountID}/balance", server.GetBalance).Methods("GET")
+	server.Router.HandleFunc("/record/debt/{recordID}", server.DeleteDebtRecord).Methods("DELETE")
+	server.Router.HandleFunc("/record/debt/{recordID}", server.UpdateDebtRecord).Methods("PUT")
 }

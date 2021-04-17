@@ -24,7 +24,7 @@ func CreateRecord(db *sql.DB, r *requests.AddRecordRequest, subID int) error {
 		return err
 		tx.Rollback()
 	}
-	err = PropagateRecordChanges(tx, subID, rec)
+	err = PropagateRecordChanges(tx, rec)
 	if err != nil {
 		return err
 	}
@@ -52,12 +52,19 @@ func UpdateRecord(db *sql.DB, recID int, r *requests.AddRecordRequest) error {
 		return err
 	}
 	if previousAmount > r.Amount {
-		rec.Amount = rec.Amount * -1
+		rec.Amount = (previousAmount - rec.Amount) * -1
+		err = PropagateRecordChanges(tx, rec)
+		if err != nil {
+			return err
+		}
+	} else if previousAmount < r.Amount {
+		rec.Amount = rec.Amount - previousAmount
+		err = PropagateRecordChanges(tx, rec)
+		if err != nil {
+			return err
+		}
 	}
-	err = PropagateRecordChanges(tx, rec.SubcategoryID, rec)
-	if err != nil {
-		return err
-	}
+
 	return nil
 }
 
@@ -79,7 +86,7 @@ func DeleteRecord(db *sql.DB, recID int) error {
 		return err
 	}
 	rec.Amount = rec.Amount * -1
-	err = PropagateRecordChanges(tx, rec.SubcategoryID, rec)
+	err = PropagateRecordChanges(tx, rec)
 	if err != nil {
 		return err
 	}
@@ -87,47 +94,11 @@ func DeleteRecord(db *sql.DB, recID int) error {
 
 }
 
-func CreateDebtRecord(db *sql.DB, r *requests.AddRecordRequest, subID int) error {
-	var err error
-	tx, err := db.Begin()
-	if err != nil {
-		return err
-	}
-	rec := &models.DebtRecord{}
-	err = tx.QueryRow("insert into keepingtrack.debt_records (name, amount, subcategory_id, payed) values ($1, $2, $3, false) RETURNING *;",
-		r.Name, r.Amount, subID).
-		Scan(&rec.Name, &rec.ID, &rec.Amount, &rec.Payed, &rec.CreatedAt, &rec.UpdatedAt, &rec.SubcategoryID)
-	if err != nil {
-		return err
-	}
-
-}
-
-func PropagateDebtRecord(tx *sql.Tx, subID int, r *models.DebtRecord) error {
+func PropagateRecordChanges(tx *sql.Tx, r *models.Record) error {
 
 	var err error
 	sub := &models.Subcategory{}
-	err = tx.QueryRow("update keepingtrack.subcategories set amount = amount + $1 where id = $2;", r.Amount, r.SubcategoryID).Err()
-	/*err = tx.QueryRow("select * from keepingtrack.subcategories where id = $1;", subID).
-							  Scan(&sub.ID, &sub.Name, &sub.Amount, &sub.CategoryID, &sub.CreatedAt, &sub.UpdatedAt)
-	if err != nil{
-		return err
-	}
-	sub.Amount += r.Amount
-	err = tx.QueryRow("update keepingtrack")*/
-	if err != nil {
-		return err
-	}
-
-	//TODO Continue Debt Record workflow
-	err = tx.QueryRow("update b set b.debt = debt + $1 from").Err()
-}
-
-func PropagateRecordChanges(tx *sql.Tx, subID int, r *models.Record) error {
-
-	var err error
-	sub := &models.Subcategory{}
-	err = tx.QueryRow("select * from keepingtrack.subcategories where id = $1;", subID).
+	err = tx.QueryRow("select * from keepingtrack.subcategories where id = $1;", r.SubcategoryID).
 		Scan(&sub.ID, &sub.Name, &sub.Amount, &sub.CategoryID, &sub.CreatedAt, &sub.UpdatedAt)
 	if err != nil {
 		return err

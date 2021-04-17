@@ -3,6 +3,7 @@ package controllers
 import (
 	"encoding/json"
 	"io/ioutil"
+	"keeping-track-backend-golang/api/models"
 	"keeping-track-backend-golang/api/repositories"
 	"keeping-track-backend-golang/api/requests"
 	"keeping-track-backend-golang/api/responses"
@@ -59,4 +60,20 @@ func (server *Server) AddIncome(w http.ResponseWriter, r *http.Request) {
 	}
 	responses.JSONString(w, http.StatusOK, "Funds succesfully added")
 
+}
+
+func (server *Server) GetBalance(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	accID, err := strconv.Atoi(vars["accountID"])
+	if err != nil {
+		responses.ERROR(w, http.StatusBadRequest, err)
+		return
+	}
+	b := &models.Balance{}
+	b, err = repositories.GetBalance(server.DB, accID)
+	if err != nil {
+		responses.ERROR(w, http.StatusInternalServerError, err)
+		return
+	}
+	responses.JSON(w, http.StatusOK, b)
 }

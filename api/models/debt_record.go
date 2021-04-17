@@ -1,6 +1,9 @@
 package models
 
-import "time"
+import (
+	"database/sql"
+	"time"
+)
 
 type DebtRecord struct {
 	ID            int
@@ -9,6 +12,6 @@ type DebtRecord struct {
 	Payed         bool
 	CreatedAt     time.Time
 	UpdatedAt     time.Time
-	PayedAt       time.Time
+	PayedAt       sql.NullTime
 	SubcategoryID int
 }

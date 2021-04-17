@@ -29,6 +29,16 @@ func MoveFundsToSavings(db *sql.DB, amount float64, accID int) error {
 
 }
 
+func GetBalance(db *sql.DB, accID int) (*models.Balance, error) {
+	b := &models.Balance{}
+	err := db.QueryRow("select * from keepingtrack.balances where account_id = $1", accID).
+		Scan(&b.ID, &b.AvailableAmount, &b.SavingsAmount, &b.Debt, &b.AccountID)
+	if err != nil {
+		return nil, err
+	}
+	return b, nil
+}
+
 func AddIncome(db *sql.DB, amount float64, accID int) error {
 
 	var err error
