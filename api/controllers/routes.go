@@ -1,5 +1,7 @@
 package controllers
 
+import "net/http"
+
 func (server *Server) initializeRoutes() {
 
 	//Accounts
@@ -19,7 +21,7 @@ func (server *Server) initializeRoutes() {
 	server.Router.HandleFunc("/{subcategoryID}/record", server.CreateRecord).Methods("POST")
 	server.Router.HandleFunc("/record/{recordID}", server.UpdateRecord).Methods("PUT")
 	server.Router.HandleFunc("/record/{recordID}", server.DeleteRecord).Methods("DELETE")
-	server.Router.HandleFunc("/{subcategoryID}/records", server.GetAllDebtRecordsBySubcategoryID).Methods("GET")
+	server.Router.HandleFunc("/{subcategoryID}/records", server.GetAllRecordsBySubcategoryID).Methods("GET")
 
 	//DebtRecords
 	server.Router.HandleFunc("/{subcategoryID}/record/debt", server.CreateDebtRecord).Methods("POST")
@@ -27,4 +29,5 @@ func (server *Server) initializeRoutes() {
 	server.Router.HandleFunc("/record/debt/{recordID}", server.UpdateDebtRecord).Methods("PUT")
 	server.Router.HandleFunc("/{subcategoryID}/records/debt", server.GetAllDebtRecordsBySubcategoryID).Methods("GET")
 
+	server.Router.PathPrefix("/").Handler(http.FileServer(http.Dir("././static/")))
 }
