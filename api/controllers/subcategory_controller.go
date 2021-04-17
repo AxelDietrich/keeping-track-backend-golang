@@ -3,7 +3,6 @@ package controllers
 import (
 	"encoding/json"
 	"errors"
-	"github.com/gorilla/mux"
 	"io/ioutil"
 	"keeping-track-backend-golang/api/models"
 	"keeping-track-backend-golang/api/repositories"
@@ -11,6 +10,8 @@ import (
 	"net/http"
 	"strconv"
 	"time"
+
+	"github.com/gorilla/mux"
 )
 
 func (server *Server) CreateSubcategory(w http.ResponseWriter, r *http.Request) {

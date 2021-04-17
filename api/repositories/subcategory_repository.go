@@ -1,67 +1,79 @@
 package repositories
 
 import (
+	"database/sql"
 	"errors"
-	"gorm.io/gorm"
 	"keeping-track-backend-golang/api/models"
 )
 
-func CreateSubcategory(db *gorm.DB, s *models.Subcategory) error {
+func CreateSubcategory(db *sql.DB, s *models.Subcategory) error {
 
 	var err error
-	var sub *models.Subcategory
-	err = db.Where("name = ? AND category_id = ?", s.Name, s.CategoryID).First(&sub).Error
-	if err == nil {
+	var isNameUsed int
+	err = db.QueryRow("select count(*) from keepingtrack.subcategories where name = $1 AND category_id = $2;", s.Name, s.CategoryID).Scan(&isNameUsed)
+	if err != nil {
+		return err
+	}
+	if isNameUsed > 0 {
 		return errors.New("There is already a subcategory with that name")
 	}
-	err = db.Create(&s).Error
+	err = db.QueryRow("insert into keepingtrack.subcategories (name, amount, category_id) values ($1, $2, $3);", s.Name, s.Amount, s.CategoryID).Err()
 	if err != nil {
 		return err
 	}
 	return nil
 }
 
-func UpdateSubcategory(db *gorm.DB, id int, name string) error {
+func UpdateSubcategory(db *sql.DB, id int, name string) error {
 
 	var err error
-	s := &models.Subcategory{}
-	s.ID = id
-	err = db.First(&s).Error
+	sub := &models.Subcategory{}
+	err = db.QueryRow("select * from keepingtrack.subcategories where id = $1;", id).Scan(&sub.ID, &sub.Name, &sub.Amount, &sub.CategoryID, &sub.CreatedAt, &sub.UpdatedAt)
 	if err != nil {
 		return err
 	}
-	s.Name = name
-	err = db.Save(&s).Error
+	err = db.QueryRow("update keepingtrack.subcategories set name = $1 where id = $2;", name, id).Err()
 	if err != nil {
 		return err
 	}
 	return nil
 }
 
-func GetSubcategory(db *gorm.DB, subID int) (*models.Subcategory, error) {
+func GetSubcategory(db *sql.DB, subID int) (*models.Subcategory, error) {
 
 	var err error
 	var sub *models.Subcategory
-	err = db.Find(&sub).Where("id = ?", subID).Error
+	err = db.QueryRow("select * from keepingtrack.subcategories where id = $1;", subID).Scan(&sub.ID, &sub.Name, &sub.Amount, &sub.CategoryID, &sub.CreatedAt, &sub.UpdatedAt)
 	if err != nil {
-		return &models.Subcategory{}, err
+		return nil, err
 	}
 	return sub, err
 }
 
-func GetAllSubcategories(db *gorm.DB, categoryID int) ([]*models.Subcategory, error) {
-	var err error
-	var subcategories []*models.Subcategory
-	err = db.Find(&subcategories).Where("category_id = ?", categoryID).Error
+func GetAllSubcategories(db *sql.DB, categoryID int) ([]*models.Subcategory, error) {
+	var (
+		err           error
+		subcategories []*models.Subcategory
+		sub           *models.Subcategory
+	)
+
+	rows, err := db.Query("select * from keepingtrack.subcategories where category_id = $1", categoryID)
 	if err != nil {
-		panic(err)
+		return nil, err
 	}
+
+	for rows.Next() {
+		rows.Scan(&sub.ID, &sub.Name, &sub.Amount, &sub.CategoryID, &sub.CreatedAt, &sub.UpdatedAt)
+		subcategories = append(subcategories, sub)
+	}
+
+	rows.Close()
 	return subcategories, nil
 }
 
-func DeleteSubcategory(db *gorm.DB, subcategoryID int) error {
+func DeleteSubcategory(db *sql.DB, subcategoryID int) error {
 	var err error
-	err = db.Where("id = ?", subcategoryID).Delete(&models.Subcategory{}).Error
+	err = db.QueryRow("delete from keepingtrack.subcategories where id = $1;", subcategoryID).Err()
 	if err != nil {
 		return err
 	}

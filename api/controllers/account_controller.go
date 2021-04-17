@@ -3,6 +3,7 @@ package controllers
 import (
 	"encoding/json"
 	"errors"
+	"html"
 	"io/ioutil"
 	m "keeping-track-backend-golang/api/models"
 	"keeping-track-backend-golang/api/repositories"
@@ -10,6 +11,7 @@ import (
 	"net/http"
 	"regexp"
 	"strings"
+	"time"
 )
 
 func (server *Server) CreateAccount(w http.ResponseWriter, r *http.Request) {
@@ -26,6 +28,7 @@ func (server *Server) CreateAccount(w http.ResponseWriter, r *http.Request) {
 		responses.ERROR(w, http.StatusBadRequest, err)
 		return
 	}
+	BeforeSave(&account)
 
 	accountPersisted, err := repositories.CreateAccount(server.DB, &account)
 	if err != nil {
@@ -33,6 +36,19 @@ func (server *Server) CreateAccount(w http.ResponseWriter, r *http.Request) {
 	} else {
 		responses.JSON(w, http.StatusOK, accountPersisted)
 	}
+}
+
+func BeforeSave(a *m.Account) error {
+	a.Username = html.EscapeString(strings.TrimSpace(a.Username))
+	a.Email = html.EscapeString(strings.TrimSpace(a.Email))
+	a.Email = strings.ToLower(a.Email)
+	a.CreatedAt = time.Now()
+	hashedPassword, err := m.Hash(a.Password)
+	if err != nil {
+		return err
+	}
+	a.Password = string(hashedPassword)
+	return nil
 }
 
 func validateAccount(action string, a *m.Account) error {

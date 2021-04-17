@@ -1,26 +1,20 @@
 package models
 
 import (
-	"gorm.io/gorm"
 	"html"
 	"strings"
 	"time"
 )
 
 type Account struct {
-	Id         int        `gorm:"primary_key;auto_increment" json:"id"`
-	Username   string     `gorm:"size:255;not null;unique" json:"username"`
-	Email      string     `gorm:"size:100;not null;unique" json:"email"`
-	Password   string     `gorm:"size:100;not null;" json:"password"`
-	Categories []Category `gorm:"OnDelete:CASCADE" json:"-"`
-	CreatedAt  time.Time  `gorm:"default:CURRENT_TIMESTAMP" json:"created_at"`
+	ID        int       `json:"id"`
+	Username  string    `json:"username"`
+	Email     string    `json:"email"`
+	Password  string    `json:"password"`
+	CreatedAt time.Time `json:"created_at"`
 }
 
-func (Account) TableName() string {
-	return "keepingtrack.accounts"
-}
-
-func (a *Account) BeforeSave(db *gorm.DB) error {
+func (a *Account) BeforeSave() error {
 	a.Username = html.EscapeString(strings.TrimSpace(a.Username))
 	a.Email = html.EscapeString(strings.TrimSpace(a.Email))
 	a.Email = strings.ToLower(a.Email)

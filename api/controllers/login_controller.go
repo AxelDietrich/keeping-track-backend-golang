@@ -8,6 +8,7 @@ import (
 	"io/ioutil"
 	m "keeping-track-backend-golang/api/models"
 	"keeping-track-backend-golang/api/repositories"
+	"keeping-track-backend-golang/api/requests"
 	"keeping-track-backend-golang/api/responses"
 	"net/http"
 	"strings"
@@ -16,14 +17,14 @@ import (
 func (server *Server) Login(w http.ResponseWriter, r *http.Request) {
 	var err error
 	reqBody, _ := ioutil.ReadAll(r.Body)
-	var login m.Account
-	err = json.Unmarshal(reqBody, &login)
+	login := &requests.Login{}
+	err = json.Unmarshal(reqBody, login)
 	if err != nil {
 		responses.ERROR(w, http.StatusInternalServerError, err)
 		return
 	}
-	PrepareLogin(&login)
-	loginDB, err := repositories.GetAccount(server.DB, &login)
+	PrepareLogin(login)
+	loginDB, err := repositories.GetAccount(server.DB, login)
 	if err != nil {
 		responses.ERROR(w, http.StatusBadRequest, err)
 		return
@@ -36,7 +37,7 @@ func (server *Server) Login(w http.ResponseWriter, r *http.Request) {
 	responses.JSONString(w, http.StatusOK, "Login successful")
 }
 
-func PrepareLogin(a *m.Account) {
+func PrepareLogin(a *requests.Login) {
 	a.Email = html.EscapeString(strings.TrimSpace(a.Email))
 	a.Email = strings.ToLower(a.Email)
 }
