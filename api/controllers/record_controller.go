@@ -27,7 +27,7 @@ func (server *Server) CreateRecord(w http.ResponseWriter, r *http.Request) {
 		responses.ERROR(w, http.StatusBadRequest, err)
 		return
 	}
-	accID, _ := strconv.Atoi(r.Header.Get("userID"))
+	accID, _ := strconv.Atoi(r.Header.Get("Userid"))
 	err = repositories.CheckIfUserSubcategory(server.DB, subID, accID)
 
 	if err != nil {
@@ -58,7 +58,7 @@ func (server *Server) UpdateRecord(w http.ResponseWriter, r *http.Request) {
 		responses.ERROR(w, http.StatusBadRequest, err)
 		return
 	}
-	accID, _ := strconv.Atoi(r.Header.Get("userID"))
+	accID, _ := strconv.Atoi(r.Header.Get("Userid"))
 	err = repositories.CheckIfUserRecord(server.DB, recID, accID)
 	if err != nil {
 		responses.ERROR(w, http.StatusBadRequest, err)
@@ -82,7 +82,7 @@ func (server *Server) DeleteRecord(w http.ResponseWriter, r *http.Request) {
 		responses.ERROR(w, http.StatusBadRequest, err)
 		return
 	}
-	accID, _ := strconv.Atoi(r.Header.Get("userID"))
+	accID, _ := strconv.Atoi(r.Header.Get("Userid"))
 	err = repositories.CheckIfUserRecord(server.DB, recID, accID)
 	if err != nil {
 		responses.ERROR(w, http.StatusBadRequest, err)
@@ -105,7 +105,7 @@ func (server *Server) GetAllRecordsBySubcategoryID(w http.ResponseWriter, r *htt
 		responses.ERROR(w, http.StatusBadRequest, err)
 		return
 	}
-	accID, _ := strconv.Atoi(r.Header.Get("userID"))
+	accID, _ := strconv.Atoi(r.Header.Get("Userid"))
 	err = repositories.CheckIfUserSubcategory(server.DB, subID, accID)
 	if err != nil {
 		responses.ERROR(w, http.StatusBadRequest, err)

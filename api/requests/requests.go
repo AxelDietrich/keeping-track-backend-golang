@@ -13,3 +13,9 @@ type Login struct {
 	Email    string
 	Password string
 }
+
+type SignUp struct {
+	Username	string
+	Email		string
+	Password	string
+}

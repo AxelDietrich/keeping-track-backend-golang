@@ -26,7 +26,7 @@ func (server *Server) CreateDebtRecord(w http.ResponseWriter, r *http.Request) {
 		responses.ERROR(w, http.StatusBadRequest, err)
 		return
 	}
-	accID, _ := strconv.Atoi(r.Header.Get("userID"))
+	accID, _ := strconv.Atoi(r.Header.Get("Userid"))
 	err = repositories.CheckIfUserSubcategory(server.DB, subID, accID)
 	if err != nil {
 		responses.ERROR(w, http.StatusBadRequest, err)
@@ -48,7 +48,7 @@ func (server *Server) DeleteDebtRecord(w http.ResponseWriter, r *http.Request) {
 		responses.ERROR(w, http.StatusBadRequest, err)
 		return
 	}
-	accID, _ := strconv.Atoi(r.Header.Get("userID"))
+	accID, _ := strconv.Atoi(r.Header.Get("Userid"))
 	err = repositories.CheckIfUserDebtRecord(server.DB, recID, accID)
 	if err != nil {
 		responses.ERROR(w, http.StatusBadRequest, err)
@@ -77,7 +77,7 @@ func (server *Server) UpdateDebtRecord(w http.ResponseWriter, r *http.Request) {
 		responses.ERROR(w, http.StatusBadRequest, err)
 		return
 	}
-	accID, _ := strconv.Atoi(r.Header.Get("userID"))
+	accID, _ := strconv.Atoi(r.Header.Get("Userid"))
 	err = repositories.CheckIfUserDebtRecord(server.DB, recID, accID)
 	if err != nil {
 		responses.ERROR(w, http.StatusBadRequest, err)
@@ -98,7 +98,7 @@ func (server *Server) GetAllDebtRecordsBySubcategoryID(w http.ResponseWriter, r 
 		responses.ERROR(w, http.StatusBadRequest, err)
 		return
 	}
-	accID, _ := strconv.Atoi(r.Header.Get("userID"))
+	accID, _ := strconv.Atoi(r.Header.Get("Userid"))
 	err = repositories.CheckIfUserSubcategory(server.DB, subID, accID)
 	if err != nil {
 		responses.ERROR(w, http.StatusBadRequest, err)

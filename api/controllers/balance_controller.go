@@ -17,7 +17,7 @@ func (server *Server) MoveFundsToSavings(w http.ResponseWriter, r *http.Request)
 
 	var err error
 	vars := mux.Vars(r)
-	if vars["accountID"] != r.Header.Get("userID") {
+	if vars["accountID"] != r.Header.Get("Userid") {
 		responses.ERROR(w, http.StatusBadRequest, err)
 		return
 	}
@@ -45,7 +45,7 @@ func (server *Server) AddIncome(w http.ResponseWriter, r *http.Request) {
 
 	var err error
 	vars := mux.Vars(r)
-	if vars["accountID"] != r.Header.Get("userID") {
+	if vars["accountID"] != r.Header.Get("Userid") {
 		responses.ERROR(w, http.StatusBadRequest, err)
 		return
 	}
@@ -72,7 +72,7 @@ func (server *Server) AddIncome(w http.ResponseWriter, r *http.Request) {
 
 func (server *Server) GetBalance(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
-	if vars["accountID"] != r.Header.Get("userID") {
+	if vars["accountID"] != r.Header.Get("Userid") {
 		responses.ERROR(w, http.StatusBadRequest, err)
 		return
 	}

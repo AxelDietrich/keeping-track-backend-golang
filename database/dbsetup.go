@@ -7,7 +7,7 @@ import (
 
 func EstablishDatabaseConnection() (*sql.DB, error) {
 
-	db, err := sql.Open("pgx", "postgres://mbdvayqu:ywLhPz6ssFEjCoIoRhYil3xxfyb8ZSmh@motty.db.elephantsql.com:5432/mbdvayqu")
+	db, err := sql.Open("pgx", "postgres://postgres:haliax@localhost:5432/keepingtrack")
 	if err != nil {
 		return nil, err
 	}

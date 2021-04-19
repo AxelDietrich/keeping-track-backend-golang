@@ -7,30 +7,36 @@ import (
 	"io/ioutil"
 	m "keeping-track-backend-golang/api/models"
 	"keeping-track-backend-golang/api/repositories"
+	"keeping-track-backend-golang/api/requests"
 	"keeping-track-backend-golang/api/responses"
 	"net/http"
 	"regexp"
 	"strings"
 	"time"
+
 )
 
 func (server *Server) CreateAccount(w http.ResponseWriter, r *http.Request) {
 	var err error
 	reqBody, _ := ioutil.ReadAll(r.Body)
-	var account m.Account
-	err = json.Unmarshal(reqBody, &account)
+	signUp := &requests.SignUp{}
+	err = json.Unmarshal(reqBody, &signUp)
 	if err != nil {
 		responses.ERROR(w, http.StatusBadRequest, err)
 		return
 	}
-	err = validateAccount("", &account)
+	account := &m.Account{}
+	account.Email = signUp.Email
+	account.Username = signUp.Username
+	account.Password = signUp.Password
+	err = validateAccount("", account)
 	if err != nil {
 		responses.ERROR(w, http.StatusBadRequest, err)
 		return
 	}
-	BeforeSave(&account)
+	BeforeSave(account)
 
-	accountPersisted, err := repositories.CreateAccount(server.DB, &account)
+	accountPersisted, err := repositories.CreateAccount(server.DB, account)
 	if err != nil {
 		responses.ERROR(w, http.StatusBadRequest, err)
 	} else {

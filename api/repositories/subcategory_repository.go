@@ -8,7 +8,7 @@ import (
 
 func CheckIfUserSubcategory(db *sql.DB, subID int, accID int) error {
 	var id int
-	err := db.QueryRow("select id from keepingtrack.subcategories s inner join keepingtrack.categories c on "+
+	err := db.QueryRow("select s.id from keepingtrack.subcategories s inner join keepingtrack.categories c on "+
 		"s.category_id = c.id where c.account_id = $1 and s.id = $2", accID, subID).
 		Scan(&id)
 	if err != nil || id == 0 {
@@ -62,17 +62,14 @@ func GetSubcategory(db *sql.DB, subID int) (*models.Subcategory, error) {
 }
 
 func GetAllSubcategories(db *sql.DB, categoryID int) ([]*models.Subcategory, error) {
-	var (
-		err           error
-		subcategories []*models.Subcategory
-		sub           *models.Subcategory
-	)
+	var err error
 
 	rows, err := db.Query("select * from keepingtrack.subcategories where category_id = $1", categoryID)
 	if err != nil {
 		return nil, err
 	}
-
+	subcategories := []*models.Subcategory{}
+	sub := &models.Subcategory{}
 	for rows.Next() {
 		rows.Scan(&sub.ID, &sub.Name, &sub.Amount, &sub.CategoryID, &sub.CreatedAt, &sub.UpdatedAt)
 		subcategories = append(subcategories, sub)

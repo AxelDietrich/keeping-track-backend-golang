@@ -22,7 +22,7 @@ func (server *Server) CreateSubcategory(w http.ResponseWriter, r *http.Request) 
 		responses.ERROR(w, http.StatusBadRequest, err)
 		return
 	}
-	accID, _ := strconv.Atoi(r.Header.Get("userID"))
+	accID, _ := strconv.Atoi(r.Header.Get("Userid"))
 	err = repositories.CheckIfUserCategory(server.DB, catID, accID)
 	if err != nil {
 		responses.ERROR(w, http.StatusBadRequest, err)
@@ -62,7 +62,7 @@ func (server *Server) ModifySubcategory(w http.ResponseWriter, r *http.Request) 
 		responses.ERROR(w, http.StatusBadRequest, err)
 		return
 	}
-	accID, err := strconv.Atoi(r.Header.Get("userID"))
+	accID, err := strconv.Atoi(r.Header.Get("Userid"))
 	err = repositories.CheckIfUserSubcategory(server.DB, id, accID)
 	if err != nil {
 		responses.ERROR(w, http.StatusBadRequest, err)
@@ -83,7 +83,7 @@ func (server *Server) DeleteSubcategory(w http.ResponseWriter, r *http.Request) 
 	if err != nil {
 		responses.ERROR(w, http.StatusBadRequest, err)
 	}
-	accID, err := strconv.Atoi(r.Header.Get("userID"))
+	accID, err := strconv.Atoi(r.Header.Get("Userid"))
 	err = repositories.CheckIfUserSubcategory(server.DB, subID, accID)
 	if err != nil {
 		responses.ERROR(w, http.StatusBadRequest, err)
@@ -104,7 +104,7 @@ func (server *Server) GetAllSubcategories(w http.ResponseWriter, r *http.Request
 		responses.ERROR(w, http.StatusBadRequest, errors.New("Invalid categoryID"))
 		return
 	}
-	accID, _ := strconv.Atoi(r.Header.Get("userID"))
+	accID, _ := strconv.Atoi(r.Header.Get("Userid"))
 	err = repositories.CheckIfUserCategory(server.DB, categoryID, accID)
 	subcategories, err := repositories.GetAllSubcategories(server.DB, categoryID)
 	responses.JSON(w, http.StatusOK, subcategories)

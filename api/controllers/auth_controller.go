@@ -12,6 +12,7 @@ import (
 	"keeping-track-backend-golang/api/requests"
 	"keeping-track-backend-golang/api/responses"
 	"net/http"
+	"strconv"
 	"strings"
 	"time"
 )
@@ -66,7 +67,7 @@ func (server *Server) Login(w http.ResponseWriter, r *http.Request) {
 		Value:   tokenString,
 		Expires: expirationTime,
 	})
-	responses.JSON(w, http.StatusOK, "Login successful")
+	responses.JSONString(w, http.StatusOK, "Login successful")
 }
 
 func AuthMiddleware(next http.HandlerFunc) http.HandlerFunc {
@@ -98,7 +99,8 @@ func AuthMiddleware(next http.HandlerFunc) http.HandlerFunc {
 			responses.ERROR(w, http.StatusUnauthorized, err)
 			return
 		}
-		r.Header.Set("userID", string(claims.UserID))
+		userID := strconv.Itoa(claims.UserID)
+		r.Header.Set("Userid", userID)
 
 		next.ServeHTTP(w, r)
 	})
